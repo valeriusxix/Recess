@@ -1,0 +1,920 @@
+{
+  "address": "DHMDwSXWxcdtRWRrg93KCpCqDFbYNKDnMQUV2MdEbKem",
+  "metadata": {
+    "name": "recess",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Parametric weekend gap insurance for tokenized stocks"
+  },
+  "instructions": [
+    {
+      "name": "buy_coverage",
+      "discriminator": [
+        21,
+        56,
+        211,
+        6,
+        104,
+        97,
+        188,
+        201
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.stock_symbol",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "docs": [
+            "Seeds are [owner, pool, coverage_start_ts], per AGENT.md §5."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "buyer"
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "arg",
+                "path": "coverage_start_ts"
+              }
+            ]
+          }
+        },
+        {
+          "name": "buyer_usdc",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "price_update",
+          "docs": [
+            "in that case. When demo mode is off, this must be a Pyth PriceUpdateV2",
+            "for `pool.pyth_feed_id`. DEMO MODE does not read this account."
+          ]
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "notional",
+          "type": "u64"
+        },
+        {
+          "name": "threshold_bps",
+          "type": "u16"
+        },
+        {
+          "name": "coverage_start_ts",
+          "type": "i64"
+        },
+        {
+          "name": "coverage_end_ts",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "deposit_liquidity",
+      "discriminator": [
+        245,
+        99,
+        59,
+        25,
+        151,
+        71,
+        233,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "lp",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.stock_symbol",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lp_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "lp"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lp_usdc",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "disable_demo_mode",
+      "docs": [
+        "One-way. Demo prices stop being used. Open policies must already be settled."
+      ],
+      "discriminator": [
+        107,
+        14,
+        244,
+        182,
+        221,
+        202,
+        192,
+        77
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "pool",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_pool",
+      "docs": [
+        "Creates the one pool for a stock and its USDC vault.",
+        "Required before the five product instructions can run."
+      ],
+      "discriminator": [
+        95,
+        180,
+        10,
+        172,
+        84,
+        174,
+        232,
+        40
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "stock_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "stock_symbol"
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "stock_symbol",
+          "type": "string"
+        },
+        {
+          "name": "pyth_feed_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "demo_mode",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_demo_prices",
+      "docs": [
+        "DEMO MODE only. Authority-gated. Not a Pyth update."
+      ],
+      "discriminator": [
+        190,
+        35,
+        73,
+        95,
+        236,
+        50,
+        197,
+        112
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "pool",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "reference_price",
+          "type": "u64"
+        },
+        {
+          "name": "settlement_price",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "settle_policy",
+      "docs": [
+        "Permissionless once the coverage window has ended."
+      ],
+      "discriminator": [
+        180,
+        234,
+        21,
+        174,
+        50,
+        214,
+        91,
+        113
+      ],
+      "accounts": [
+        {
+          "name": "settler",
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.stock_symbol",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "owner_usdc",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "price_update",
+          "docs": [
+            "this must be a Pyth PriceUpdateV2 for `pool.pyth_feed_id`.",
+            "DEMO MODE does not read this account."
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_liquidity",
+      "discriminator": [
+        149,
+        158,
+        33,
+        185,
+        47,
+        243,
+        253,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "lp",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.stock_symbol",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lp_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "lp"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lp_usdc",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "shares",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "LpPosition",
+      "discriminator": [
+        105,
+        241,
+        37,
+        200,
+        224,
+        2,
+        252,
+        90
+      ]
+    },
+    {
+      "name": "Policy",
+      "discriminator": [
+        222,
+        135,
+        7,
+        163,
+        235,
+        177,
+        33,
+        68
+      ]
+    },
+    {
+      "name": "Pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSymbol",
+      "msg": "Stock symbol must be 1-8 ASCII alphanumeric characters"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidFeedId",
+      "msg": "Pyth feed id is empty"
+    },
+    {
+      "code": 6002,
+      "name": "MintDecimalsMustBeSix",
+      "msg": "USDC mint must have 6 decimals"
+    },
+    {
+      "code": 6003,
+      "name": "ZeroAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6004,
+      "name": "ZeroShares",
+      "msg": "Deposit would mint zero shares"
+    },
+    {
+      "code": 6005,
+      "name": "ZeroWithdrawal",
+      "msg": "Withdrawal would return zero USDC"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientShares",
+      "msg": "Not enough LP shares"
+    },
+    {
+      "code": 6007,
+      "name": "WithdrawalWouldStarvePayouts",
+      "msg": "Withdrawal would leave the vault below outstanding policy notionals"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidWindow",
+      "msg": "Coverage window end must be after the start"
+    },
+    {
+      "code": 6009,
+      "name": "WindowAlreadyEnded",
+      "msg": "Coverage window has already ended"
+    },
+    {
+      "code": 6010,
+      "name": "WindowStillOpen",
+      "msg": "Coverage window has not ended yet"
+    },
+    {
+      "code": 6011,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6012,
+      "name": "PremiumTooSmall",
+      "msg": "Premium rounds to zero; increase the notional"
+    },
+    {
+      "code": 6013,
+      "name": "InsufficientPoolLiquidity",
+      "msg": "Pool cannot cover this notional"
+    },
+    {
+      "code": 6014,
+      "name": "DemoModeDisabled",
+      "msg": "Demo prices can only be set while demo mode is on"
+    },
+    {
+      "code": 6015,
+      "name": "DemoPricesNotSet",
+      "msg": "Set demo prices before buying or settling in demo mode"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidPrice",
+      "msg": "Price must be greater than zero"
+    },
+    {
+      "code": 6017,
+      "name": "StaleOrInvalidPrice",
+      "msg": "Pyth price is missing, stale, or for a different feed"
+    },
+    {
+      "code": 6018,
+      "name": "PolicyNotActive",
+      "msg": "Policy is not active"
+    },
+    {
+      "code": 6019,
+      "name": "Unauthorized",
+      "msg": "Account owner does not match this pool"
+    },
+    {
+      "code": 6020,
+      "name": "WindowStartTooOld",
+      "msg": "Coverage window start is too far in the past"
+    },
+    {
+      "code": 6021,
+      "name": "WindowTooLong",
+      "msg": "Coverage window is longer than 14 days"
+    },
+    {
+      "code": 6022,
+      "name": "NotionalExceedsCap",
+      "msg": "Notional exceeds 25% of the vault"
+    },
+    {
+      "code": 6023,
+      "name": "ThresholdNotInTable",
+      "msg": "Threshold must be 2%, 5%, or 10%"
+    },
+    {
+      "code": 6024,
+      "name": "DepositsDisabledInsolvent",
+      "msg": "Vault is empty while LP shares are still outstanding"
+    },
+    {
+      "code": 6025,
+      "name": "PriceConfidenceTooWide",
+      "msg": "Pyth confidence interval is too wide"
+    },
+    {
+      "code": 6026,
+      "name": "SettlementPriceOutOfWindow",
+      "msg": "Settlement price is outside the coverage end window"
+    },
+    {
+      "code": 6027,
+      "name": "DemoModeAlreadyOff",
+      "msg": "Demo mode is already off"
+    },
+    {
+      "code": 6028,
+      "name": "PoliciesStillActive",
+      "msg": "Settle open policies before turning demo mode off"
+    }
+  ],
+  "types": [
+    {
+      "name": "LpPosition",
+      "docs": [
+        "Per-LP share balance. The pool only stores the total, so withdraw needs",
+        "this account to burn the caller's shares and nobody else's."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "shares",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Policy",
+      "docs": [
+        "PDA seeds: [owner, pool, coverage_start_ts] as specified in AGENT.md §5."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "notional",
+            "docs": [
+              "USDC notional, 6 decimals."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "threshold_bps",
+            "docs": [
+              "Snapped to the premium tier table. 500 = 5%."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "premium_paid",
+            "type": "u64"
+          },
+          {
+            "name": "reference_price",
+            "docs": [
+              "Captured at buy_coverage. 1e8 fixed-point USD."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "coverage_start_ts",
+            "type": "i64"
+          },
+          {
+            "name": "coverage_end_ts",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "PolicyStatus"
+              }
+            }
+          },
+          {
+            "name": "payout_amount",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyStatus",
+      "docs": [
+        "`Expired` is part of the data model. v1 only transitions Active → Settled."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Settled"
+          },
+          {
+            "name": "Expired"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "stock_symbol",
+            "type": "string"
+          },
+          {
+            "name": "pyth_feed_id",
+            "docs": [
+              "Pyth Core feed id (32 bytes), not a Solana account address."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "usdc_mint",
+            "docs": [
+              "6-decimal mint the vault holds. Tests use a local mint; devnet can use USDC."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_lp_shares",
+            "type": "u64"
+          },
+          {
+            "name": "outstanding_notional",
+            "docs": [
+              "Sum of notionals on Active policies. Withdrawals cannot push the vault",
+              "below this, so a payout cannot be starved. Maintained here because the",
+              "program cannot iterate every policy account."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "premiums_collected",
+            "docs": [
+              "Cumulative premiums paid in. The liquidity page uses this for a simple APY."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "demo_mode",
+            "docs": [
+              "When true, buy/settle read set_demo_prices instead of Pyth.",
+              "Fixed at initialize. There is no toggle instruction."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "demo_prices_set",
+            "type": "bool"
+          },
+          {
+            "name": "demo_reference_price",
+            "docs": [
+              "DEMO MODE only. Operator-supplied reference, 1e8 fixed point."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "demo_settlement_price",
+            "docs": [
+              "DEMO MODE only. Operator-supplied settlement price, 1e8 fixed point."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

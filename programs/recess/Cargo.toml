@@ -1,0 +1,31 @@
+[package]
+name = "recess"
+version = "0.1.0"
+description = "Parametric weekend gap insurance for tokenized stocks"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "recess"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+[dependencies]
+anchor-lang = { version = "0.32.1", features = ["init-if-needed"] }
+anchor-spl = "0.32.1"
+# Message types only. Do not enable the `solana-program` feature: it pulls
+# `anchor-lang >=0.28` and `solana-program >=1.13`, which Cargo resolves to
+# Anchor 1.x / solana-program 5 and will not compile next to anchor-lang 0.32.
+# Without that feature, PriceFeedMessage uses borsh 0.10 — the same bytes the
+# Pyth receiver writes into a PriceUpdateV2 account.
+borsh = "0.10.4"
+pythnet-sdk = "=2.3.1"
