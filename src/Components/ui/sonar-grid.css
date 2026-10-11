@@ -1,0 +1,25 @@
+[data-slot="sonar-grid"] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+[data-slot="sonar-grid"] > .sonar-grid-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sonar-grid-interactive {
+  cursor: crosshair;
+}
+
+.sonar-grid-background {
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
